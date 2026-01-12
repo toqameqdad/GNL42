@@ -6,9 +6,10 @@
 /*   By: tmeqdad <toqa.meqdad@learner.42.tech>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/02 17:22:02 by tmeqdad           #+#    #+#             */
-/*   Updated: 2026/01/02 17:22:02 by tmeqdad          ###   ########.fr       */
+/*   Updated: 2026/01/12 16:30:00 by tmeqdad          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 

@@ -1,27 +1,53 @@
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "get_next_line.h"
 
-int main(void)
+void	run_test(const char *filename)
 {
-    int fd;
-    char *line;
+	int		fd;
+	char	*line;
+	int		i;
 
-    fd = open("test.txt", O_RDONLY);
-    if (fd < 0)
-        return (1);
+	printf("\n=== Testing file: %s ===\n", filename);
+	fd = open(filename, O_RDONLY);
+	if (fd < 0)
+	{
+		perror("open");
+		return;
+	}
+	i = 1;
+	while (1)
+	{
+		line = get_next_line(fd);
+		if (!line)
+			break;
+		printf("%d: %s", i++, line);
+		free(line);
+	}
+	close(fd);
+}
 
-    line = get_next_line(fd);
-printf("1: %s", line);
-free(line);
+int	main(void)
+{
+	// Test files
+	run_test("test1.txt");
+	run_test("test2.txt");
+	run_test("test3.txt");
+	run_test("test4.txt");
+	run_test("test5.txt");
 
-line = get_next_line(fd);
-printf("2: %s", line);
-free(line);
+	// Test stdin
+	printf("\n=== Testing stdin ===\n");
+	printf("Type a few lines, then Ctrl+D to end:\n");
+	int fd = 0; // stdin
+	char *line;
+	int i = 1;
+	while ((line = get_next_line(fd)))
+	{
+		printf("%d: %s", i++, line);
+		free(line);
+	}
 
-line = get_next_line(fd);
-printf("3: %s", line);
-free(line);
-
-    close(fd);
+	return 0;
 }

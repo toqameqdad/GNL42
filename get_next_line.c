@@ -6,7 +6,7 @@
 /*   By: tmeqdad <toqa.meqdad@learner.42.tech>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/02 17:21:48 by tmeqdad           #+#    #+#             */
-/*   Updated: 2026/01/02 17:21:48 by tmeqdad          ###   ########.fr       */
+/*   Updated: 2026/01/12 16:30:00 by tmeqdad          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,17 @@ static char	*ft_strjoin_free(char *s1, char *s2)
 	int		j;
 	char	*res;
 
-	i = 0;
-	j = 0;
 	if (!s1)
 		return (ft_substr(s2, 0, ft_strlen(s2)));
 	res = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
 	if (!res)
 		return (NULL);
+	i = 0;
 	while (s1[i])
-		res[i++] = s1[j++];
+	{
+		res[i] = s1[i];
+		i++;
+	}
 	j = 0;
 	while (s2[j])
 		res[i++] = s2[j++];
@@ -39,9 +41,9 @@ static char	*extract_line(char *stash)
 {
 	int	i;
 
-	i = 0;
 	if (!stash || !stash[0])
 		return (NULL);
+	i = 0;
 	while (stash[i] && stash[i] != '\n')
 		i++;
 	if (stash[i] == '\n')
@@ -54,6 +56,8 @@ static char	*clean_stash(char *stash)
 	int		i;
 	char	*new_stash;
 
+	if (!stash)
+		return (NULL);
 	i = 0;
 	while (stash[i] && stash[i] != '\n')
 		i++;
@@ -62,29 +66,46 @@ static char	*clean_stash(char *stash)
 		free(stash);
 		return (NULL);
 	}
-	new_stash = ft_substr(stash, i + 1, ft_strlen(stash) - i);
+	new_stash = ft_substr(stash, i + 1, ft_strlen(stash) - i - 1);
 	free(stash);
 	return (new_stash);
 }
 
-char	*get_next_line(int fd)
+static char	*read_to_stash(int fd, char *stash)
 {
-	static char	*stash;
-	int			bytes;
-	char		buffer[BUFFER_SIZE + 1];
-	char		*line;
+	char	*buffer;
+	int		bytes;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	buffer = malloc(BUFFER_SIZE + 1);
+	if (!buffer)
 		return (NULL);
 	bytes = 1;
 	while (!ft_strchr(stash, '\n') && bytes > 0)
 	{
 		bytes = read(fd, buffer, BUFFER_SIZE);
 		if (bytes < 0)
+		{
+			free(buffer);
+			free(stash);
 			return (NULL);
+		}
 		buffer[bytes] = '\0';
 		stash = ft_strjoin_free(stash, buffer);
 	}
+	free(buffer);
+	return (stash);
+}
+
+char	*get_next_line(int fd)
+{
+	static char	*stash;
+	char		*line;
+
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	stash = read_to_stash(fd, stash);
+	if (!stash)
+		return (NULL);
 	line = extract_line(stash);
 	stash = clean_stash(stash);
 	return (line);
